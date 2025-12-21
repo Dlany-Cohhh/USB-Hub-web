@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   mqtt-usb-hub:
@@ -11,8 +10,8 @@ services:
     environment:
       - TZ=Asia/Shanghai
     volumes:
-      # 如果需要持久化配置，可以挂载配置文件
-      - ./config:/usr/share/nginx/html/config:ro
+      # 如果需要持久化配置，可以挂载配置文件（避免与 /usr/share/nginx/html 的只读挂载冲突）
+      - ./config:/usr/share/nginx/html_config:ro
       # 本地前端静态资源，包含 ui_control.html, ui_control.js, ui_control.css
       - ./resource:/usr/share/nginx/html:ro
     labels:
