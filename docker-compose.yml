@@ -2,15 +2,21 @@ version: '3.8'
 
 services:
   mqtt-usb-hub:
-    image: your-docker-registry/mqtt-usb-hub:latest
-    container_name: mqtt-usb-hub-control
+    build: .
+    image: ${IMAGE_NAME:-your-docker-registry/mqtt-usb-hub:latest}
+    container_name: ${CONTAINER_NAME:-mqtt-usb-hub-control}
     ports:
-      - "8080:80"
+      - "49152:80"
     restart: unless-stopped
     environment:
       - TZ=Asia/Shanghai
     volumes:
+      # 如果需要持久化配置，可以挂载配置文件
       - ./config:/usr/share/nginx/html/config:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mqtt-usb-hub.rule=Host(`your-domain.com`)"
+      - "traefik.http.services.mqtt-usb-hub.loadbalancer.server.port=80"
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
       interval: 30s
