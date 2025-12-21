@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  mqtt-usb-hub:
+    image: your-docker-registry/mqtt-usb-hub:latest
+    container_name: mqtt-usb-hub-control
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./config:/usr/share/nginx/html/config:ro
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: mqtt-usb-hub-network
+
+

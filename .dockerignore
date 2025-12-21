@@ -1,0 +1,27 @@
+# Docker相关文件
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Git相关
+.git
+.gitignore
+
+# 开发工具配置
+.vscode
+.kiro
+
+# 文档文件（可选，如果不想包含在镜像中）
+# README.md
+# *.md
+
+# 临时文件
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# Node.js相关（如果有的话）
+node_modules
+npm-debug.log
+yarn-error.log

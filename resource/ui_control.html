@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USB-Hub 数字化终端 | 工业控制面板</title>
+    
+    <!-- 字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 样式表 -->
+    <link rel="stylesheet" href="ui_control.css">
+    
+    <meta name="description" content="商用级 USB-Hub 数字化终端控制面板 - 工业科幻风格">
+</head>
+<body>
+    <!-- 加载遮罩 -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>正在初始化数字化终端...</p>
+        </div>
+    </div>
+
+    <!-- 顶部战术连接面板 -->
+    <header class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <i class="fas fa-microchip" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+                <div>
+                    <h1>USB-HUB 数字化终端</h1>
+                    <div id="currentPage" style="font-size: 0.8rem; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace;">
+                        页面: 未连接
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <div id="connectionStatus" class="connection-status status-disconnected">
+                    <i class="fas fa-wifi"></i>
+                    <span>未连接</span>
+                </div>
+                <button id="refreshBtn" class="refresh-btn" title="刷新状态">
+                    <i class="fas fa-sync"></i>
+                </button>
+                <button id="themeToggle" class="theme-toggle">
+                    <i class="fas fa-sun"></i>
+                    <span class="theme-text">浅色模式</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 可见的提示容器（用于自动连接/超时提示） -->
+    <div id="toastContainer" aria-live="polite" role="status"></div>
+
+    <!-- 主要内容区域 -->
+    <main class="container">
+        <!-- 左侧面板（已移除，USB 端口动力矩阵 将占据此位置） -->
+
+        <!-- 中部面板：USB端口动力矩阵（占据左侧与中间列） -->
+        <section class="panel panel-cut-corner hologram scan-lines" style="grid-column: 1 / span 2;">
+            <h3><i class="fas fa-bolt"></i> USB 端口动力矩阵</h3>
+            
+            <div class="usb-grid" id="usbGrid">
+                <!-- USB端口1 -->
+                <div id="usbPort1" class="usb-port">
+                    <div class="port-header">
+                        <h4>USB-01</h4>
+                        <div class="toggle-switch">
+                            <input id="usb1Toggle" type="checkbox" onchange="toggleUSBPort(1)">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                    <div class="port-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">电压</span>
+                            <span id="usb1Voltage" class="stat-value">5.23V</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">电流</span>
+                            <span id="usb1Current" class="stat-value">0mA</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">功率</span>
+                            <span id="usb1Power" class="stat-value">0 mW</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- USB端口2 -->
+                <div id="usbPort2" class="usb-port">
+                    <div class="port-header">
+                        <h4>USB-02</h4>
+                        <div class="toggle-switch">
+                            <input id="usb2Toggle" type="checkbox" onchange="toggleUSBPort(2)">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                    <div class="port-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">电压</span>
+                            <span id="usb2Voltage" class="stat-value">5.23V</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">电流</span>
+                            <span id="usb2Current" class="stat-value">0mA</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">功率</span>
+                            <span id="usb2Power" class="stat-value">0 mW</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- USB端口3 -->
+                <div id="usbPort3" class="usb-port">
+                    <div class="port-header">
+                        <h4>USB-03</h4>
+                        <div class="toggle-switch">
+                            <input id="usb3Toggle" type="checkbox" onchange="toggleUSBPort(3)">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                    <div class="port-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">电压</span>
+                            <span id="usb3Voltage" class="stat-value">5.23V</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">电流</span>
+                            <span id="usb3Current" class="stat-value">0mA</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">功率</span>
+                            <span id="usb3Power" class="stat-value">300 mW</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- USB端口4 -->
+                <div id="usbPort4" class="usb-port">
+                    <div class="port-header">
+                        <h4>USB-04</h4>
+                        <div class="toggle-switch">
+                            <input id="usb4Toggle" type="checkbox" onchange="toggleUSBPort(4)">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                    <div class="port-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">电压</span>
+                            <span id="usb4Voltage" class="stat-value">5.22V</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">电流</span>
+                            <span id="usb4Current" class="stat-value">0mA</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">功率</span>
+                            <span id="usb4Power" class="stat-value">300 mW</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 每端口功率图表（USB 动力矩阵下方） -->
+            <div class="power-charts" aria-label="USB 端口功率图表">
+                <div class="power-chart" id="powerChart1">
+                    <div class="chart-title">USB-01 功率监控</div>
+                    <canvas id="usbPowerChart1" width="480" height="240" role="img" aria-label="USB 1 power chart"></canvas>
+                    <div class="chart-stats">
+                        <div class="chart-stat-item">
+                            <span class="chart-stat-label">当前</span>
+                            <span class="chart-stat-value" id="chart1Current">0 mW</span>
+                        </div>
+                        <div class="chart-stat-item">
+                            <span class="chart-stat-label">峰值</span>
+                            <span class="chart-stat-value" id="chart1Peak">0 mW</span>
+                        </div>
+                        <div class="chart-stat-item">
+                            <span class="chart-stat-label">平均</span>
+                            <span class="chart-stat-value" id="chart1Avg">0 mW</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="power-chart" id="powerChart2">
+                    <div class="chart-title">USB-02 功率监控</div>
+                    <canvas id="usbPowerChart2" width="480" height="240" role="img" aria-label="USB 2 power chart"></canvas>
+                    <div class="chart-stats">
+                        <div class="chart-stat-item">
+                            <span class="chart-stat-label">当前</span>
+                            <span class="chart-stat-value" id="chart2Current">0 mW</span>
+                        </div>
+                        <div class="chart-stat-item">
+                            <span class="chart-stat-label">峰值</span>
+                            <span class="chart-stat-value" id="chart2Peak">0 mW</span>
+                        </div>
+                        <div class="chart-stat-item">
+                            <span class="chart-stat-label">平均</span>
+                            <span class="chart-stat-value" id="chart2Avg">0 mW</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="power-chart" id="powerChart3">
+                    <div class="chart-title">USB-03 功率监控</div>
+                    <canvas id="usbPowerChart3" width="480" height="240" role="img" aria-label="USB 3 power chart"></canvas>
+                    <div class="chart-stats">
+                        <div class="chart-stat-item">
+                            <span class="chart-stat-label">当前</span>
+                            <span class="chart-stat-value" id="chart3Current">0 mW</span>
+                        </div>
+                        <div class="chart-stat-item">
+                            <span class="chart-stat-label">峰值</span>
+                            <span class="chart-stat-value" id="chart3Peak">0 mW</span>
+                        </div>
+                        <div class="chart-stat-item">
+                            <span class="chart-stat-label">平均</span>
+                            <span class="chart-stat-value" id="chart3Avg">0 mW</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="power-chart" id="powerChart4">
+                    <div class="chart-title">USB-04 功率监控</div>
+                    <canvas id="usbPowerChart4" width="480" height="240" role="img" aria-label="USB 4 power chart"></canvas>
+                    <div class="chart-stats">
+                        <div class="chart-stat-item">
+                            <span class="chart-stat-label">当前</span>
+                            <span class="chart-stat-value" id="chart4Current">0 mW</span>
+                        </div>
+                        <div class="chart-stat-item">
+                            <span class="chart-stat-label">峰值</span>
+                            <span class="chart-stat-value" id="chart4Peak">0 mW</span>
+                        </div>
+                        <div class="chart-stat-item">
+                            <span class="chart-stat-label">平均</span>
+                            <span class="chart-stat-value" id="chart4Avg">0 mW</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-buttons">
+                <button onclick="controlAllUSB(true)" class="btn btn-primary btn-industrial">
+                    <i class="fas fa-power-off"></i> 全部开启
+                </button>
+                <button onclick="controlAllUSB(false)" class="btn btn-secondary btn-industrial">
+                    <i class="fas fa-ban"></i> 全部关闭
+                </button>
+            </div>
+        </section>
+
+        <!-- 右侧面板：能源拓扑图与遥测 -->
+        <section class="panel panel-cut-corner quantum-particles matrix-rain">
+            <h3><i class="fas fa-chart-line"></i> 能源拓扑监控</h3>
+            
+            <!-- 水平排列的功率显示和环形图 -->
+            <div style="display: flex; align-items: center; justify-content: space-around; margin-bottom: 24px; flex-wrap: wrap;">
+                <!-- 总功率显示 -->
+                <div style="text-align: center; flex: 1; min-width: 150px;">
+                        <div style="font-size: 2rem; font-family: 'JetBrains Mono', monospace; color: var(--primary-color); text-shadow: 0 0 10px currentColor;">
+                        <span id="totalPower">0</span><span style="font-size: 1rem;">mW</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">
+                        总功率输出
+                    </div>
+                </div>
+
+                <!-- 负载百分比环形图 -->
+                <div style="text-align: center; flex: 1; min-width: 150px;">
+                    <div style="position: relative; width: 120px; height: 120px; margin: 0 auto;">
+                        <svg width="120" height="120" style="transform: rotate(-90deg);">
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border-color)" stroke-width="8"/>
+                            <circle id="powerCircle" cx="60" cy="60" r="50" fill="none" stroke="var(--primary-color)" 
+                                    stroke-width="8" stroke-dasharray="314" stroke-dashoffset="314" 
+                                    style="transition: stroke-dashoffset 0.5s ease; filter: drop-shadow(0 0 5px var(--primary-color));"/>
+                        </svg>
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                            <div id="powerPercentage" style="font-size: 1.2rem; font-weight: 700; color: var(--primary-color);">0%</div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary);">负载</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快速操作 -->
+            <h4><i class="fas fa-bolt"></i> 快速操作</h4>
+            <div class="control-buttons" style="grid-template-columns: 1fr;">
+                <button onclick="requestMqttStatus(true)" class="btn btn-primary btn-industrial">
+                    <i class="fas fa-satellite-dish"></i> 获取MQTT状态
+                </button>
+                <button onclick="emergencyShutdown()" class="btn btn-danger btn-industrial" 
+                        style="animation: emergencyPulse 2s ease-in-out infinite;">
+                    <i class="fas fa-exclamation-triangle"></i> 紧急断电
+                </button>
+            </div>
+            
+            <hr style="border: none; height: 1px; background: var(--border-color); margin: 24px 0;">
+
+            <h4><i class="fas fa-sliders-h"></i> 设置控制</h4>
+            <!-- 将图表显示控制从左侧面板移入此处 -->
+            <div class="chart-control-panel" style="margin-top:8px;">
+                <div class="control-group">
+                    <label class="control-label">显示参数:</label>
+                    <select id="chartDisplayMode" onchange="changeChartDisplayMode(this.value)" class="chart-select">
+                        <option value="power">功率 (mW)</option>
+                        <option value="voltage">电压 (V)</option>
+                        <option value="current">电流 (mA)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">时间范围:</label>
+                    <select id="chartTimeRange" onchange="changeChartTimeRange(this.value)" class="chart-select">
+                        <option value="50">最近50个点</option>
+                        <option value="100">最近100个点</option>
+                        <option value="200">最近200个点</option>
+                    </select>
+                </div>
+                <div class="control-buttons compact-grid" style="grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px;">
+                    <button onclick="resetChartHistory()" class="btn btn-secondary small-btn">
+                        <i class="fas fa-refresh"></i> 重置历史
+                    </button>
+                    <button onclick="exportChartData()" class="btn btn-primary small-btn">
+                        <i class="fas fa-download"></i> 导出数据
+                    </button>
+                </div>
+            </div>
+            
+            <hr style="border: none; height: 1px; background: var(--border-color); margin: 24px 0;">
+
+            <h4><i class="fas fa-cogs"></i> 系统控制</h4>
+            <div class="control-buttons" style="grid-template-columns: 1fr;">
+                <button onclick="getSystemInfo()" class="btn btn-primary btn-industrial">
+                    <i class="fas fa-info-circle"></i> 系统信息
+                </button>
+                <button onclick="restartSystem()" class="btn btn-secondary btn-industrial">
+                    <i class="fas fa-redo"></i> 重启系统
+                </button>
+                <button onclick="factoryReset()" class="btn btn-danger btn-industrial">
+                    <i class="fas fa-exclamation-triangle"></i> 恢复出厂
+                </button>
+            </div>
+
+            <div class="system-status">
+                <div class="status-row">
+                    <span class="status-label">WiFi 状态</span>
+                    <span id="wifiStatus" class="status-value">-</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">IP 地址</span>
+                    <span id="ipAddress" class="status-value">-</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">运行时间</span>
+                    <span id="uptime" class="status-value">-</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">工作模式</span>
+                    <span id="workMode" class="status-value" style="color: var(--warning-color);">等待连接</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 底部系统诊断日志：使用与主面板相同三列网格，日志面板跨列显示 -->
+    <section style="padding: 0 0 24px; margin-top: 32px;">
+        <div style="max-width: 1600px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: 350px 1fr 350px; gap: 24px;">
+            <div class="log-panel" style="grid-column: 1 / -1;">
+                <div class="log-header">
+                    <h3><i class="fas fa-terminal"></i> 系统诊断日志</h3>
+                    <button onclick="clearLog()" class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;">
+                        <i class="fas fa-trash"></i> 清空
+                    </button>
+                </div>
+                <div id="logContent" class="log-content"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 脚本 -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="ui_control.js"></script>
+
+    <style>
+        @keyframes emergencyPulse {
+            0%, 100% { 
+                box-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 25px rgba(255, 68, 68, 0.6);
+                transform: scale(1.02);
+            }
+        }
+    </style>
+</body>
+</html>
