@@ -13,6 +13,8 @@ services:
     volumes:
       # 如果需要持久化配置，可以挂载配置文件
       - ./config:/usr/share/nginx/html/config:ro
+      # 本地前端静态资源，包含 ui_control.html, ui_control.js, ui_control.css
+      - ./resource:/usr/share/nginx/html:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.mqtt-usb-hub.rule=Host(`your-domain.com`)"

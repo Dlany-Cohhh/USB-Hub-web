@@ -57,3 +57,5 @@ $COMPOSE_CMD -f "$COMPOSE_FILE" logs --tail=200
 echo "Deploy finished."
 
 
+
+
